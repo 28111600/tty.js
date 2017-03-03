@@ -228,8 +228,8 @@
         this.tabs = [];
         this.focused = null;
 
-        this.cols = Terminal.geometry[0];
-        this.rows = Terminal.geometry[1];
+        this.cols = 90; // Terminal.geometry[0];
+        this.rows = 30; //Terminal.geometry[1];
 
         el.appendChild(grip);
         el.appendChild(bar);
@@ -414,9 +414,10 @@
             off(document, 'mousemove', move);
             off(document, 'mouseup', up);
         }
-        move(ev);
+
         on(document, 'mousemove', move);
         on(document, 'mouseup', up);
+        move(ev);
     };
 
     Window.prototype.maximize = function() {
