@@ -228,8 +228,8 @@
         this.tabs = [];
         this.focused = null;
 
-        this.cols = 90; // Terminal.geometry[0];
-        this.rows = 30; //Terminal.geometry[1];
+        this.cols = Terminal.geometry[0];
+        this.rows = Terminal.geometry[1];
 
         el.appendChild(grip);
         el.appendChild(bar);
