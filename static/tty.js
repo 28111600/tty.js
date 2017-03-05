@@ -153,20 +153,6 @@
             }
         }, 2 * 1000);
 
-        // Keep windows maximized.
-        on(window, 'resize', function() {
-            var i = tty.windows.length,
-                win;
-
-            while (i--) {
-                win = tty.windows[i];
-                if (win.minimize) {
-                    win.minimize();
-                    win.maximize();
-                }
-            }
-        });
-
         tty.emit('load');
         tty.emit('open');
     };
@@ -303,11 +289,6 @@
 
             cancel(ev);
 
-            /* if (new Date - last < 600) {
-               return self.maximize();
-               }
-               last = new Date;
-               */
             self.drag(ev);
 
             return cancel(ev);
@@ -334,8 +315,6 @@
         if (this.destroyed) return;
         this.destroyed = true;
 
-        if (this.minimize) this.minimize();
-
         splice(tty.windows, this);
         if (tty.windows.length) tty.windows[0].focus();
 
@@ -352,8 +331,6 @@
     Window.prototype.drag = function(ev) {
         var self = this,
             content = this.content;
-
-        if (this.minimize) return;
 
         var drag = {
             left: content.offsetLeft,
@@ -397,8 +374,6 @@
             el = this.element,
             term = this.focused;
 
-        if (this.minimize) delete this.minimize;
-
         var resize = {
             w: term.element.clientWidth,
             h: term.element.clientHeight
@@ -419,11 +394,7 @@
         term.element.style.height = '100%';
 
         function move(ev) {
-            /*  var x, y;
-            y = el.offsetHeight - term.element.clientHeight;
-            x = ev.pageX - el.offsetLeft;
-            y = (ev.pageY - el.offsetTop) - y;
-*/
+
             var w = size.w + ev.pageX - size.x;
             var h = size.h + ev.pageY - size.y;
 
@@ -457,122 +428,9 @@
 
         on(document, 'mousemove', move);
         on(document, 'mouseup', up);
-        //  move(ev);
+
     };
 
-    Window.prototype.resizing2 = function(ev) {
-        var self = this,
-            el = this.element,
-            term = this.focused;
-
-        if (this.minimize) delete this.minimize;
-
-        var resize = {
-            w: el.clientWidth,
-            h: el.clientHeight
-        };
-
-        el.style.overflow = 'hidden';
-        el.style.opacity = '0.70';
-        el.style.cursor = 'se-resize';
-        root.style.cursor = 'se-resize';
-        term.element.style.height = '100%';
-
-        function move(ev) {
-            var x, y;
-            y = el.offsetHeight - term.element.clientHeight;
-            x = ev.pageX - el.offsetLeft;
-            y = (ev.pageY - el.offsetTop) - y;
-            el.style.width = x + 'px';
-            el.style.height = y + 'px';
-        }
-
-        function up() {
-            var x, y;
-
-            x = el.clientWidth / resize.w;
-            y = el.clientHeight / resize.h;
-            x = (x * term.cols) | 0;
-            y = (y * term.rows) | 0;
-
-            self.resize(x, y);
-
-            el.style.width = '';
-            el.style.height = '';
-
-            el.style.overflow = '';
-            el.style.opacity = '';
-            el.style.cursor = '';
-            root.style.cursor = '';
-            term.element.style.height = '';
-
-            off(document, 'mousemove', move);
-            off(document, 'mouseup', up);
-        }
-
-        on(document, 'mousemove', move);
-        on(document, 'mouseup', up);
-        move(ev);
-    };
-
-    Window.prototype.maximize = function() {
-        if (this.minimize) return this.minimize();
-
-        var self = this,
-            el = this.element,
-            term = this.focused,
-            content = this.content,
-            x, y;
-
-        var m = {
-            cols: term.cols,
-            rows: term.rows,
-            left: el.offsetLeft,
-            top: el.offsetTop,
-            root: root.className
-        };
-
-        this.minimize = function() {
-            delete this.minimize;
-
-            content.style.left = m.left + 'px';
-            content.style.top = m.top + 'px';
-            content.style.width = '';
-            content.style.height = '';
-            term.element.style.width = '';
-            term.element.style.height = '';
-            content.style.boxSizing = '';
-            self.grip.style.display = '';
-            root.className = m.root;
-
-            self.resize(m.cols, m.rows);
-
-            tty.emit('minimize window', self);
-            self.emit('minimize');
-        };
-
-        window.scrollTo(0, 0);
-
-        x = root.clientWidth / term.element.offsetWidth;
-        y = root.clientHeight / term.element.offsetHeight;
-        x = (x * term.cols) | 0;
-        y = (y * term.rows) | 0;
-
-        content.style.left = '0px';
-        content.style.top = '0px';
-        content.style.width = '100%';
-        content.style.height = '100%';
-        term.element.style.width = '100%';
-        term.element.style.height = '100%';
-        content.style.boxSizing = 'border-box';
-        this.grip.style.display = 'none';
-        root.className = 'maximized';
-
-        this.resize(x, y);
-
-        tty.emit('maximize window', this);
-        this.emit('maximize');
-    };
 
     Window.prototype.resize = function(cols, rows) {
         this.cols = cols;
