@@ -49,6 +49,21 @@
      * Open
      */
 
+    var _isEmptyObject = function(obj) {
+
+        var name;
+        for (name in obj) {
+            return false;
+        }
+        return true;
+    }
+
+    window.onbeforeunload = function() {
+        if (!_isEmptyObject(tty.terms)) {
+            return true;
+        }
+    }
+
     tty.open = function() {
         if (document.location.pathname) {
             var parts = document.location.pathname.split('/'),
@@ -255,7 +270,11 @@
         content.appendChild(el);
         content.appendChild(statusbar);
 
-        body.appendChild(content);
+        var main = document.querySelector("#main");
+        main.appendChild(content);
+
+
+
         tty.windows.push(this);
 
         this.createTab();
@@ -313,12 +332,13 @@
 
     Window.prototype.focus = function() {
         // Restack
-        var parent = this.element.parentNode;
-        /* if (parent) {
-            parent.removeChild(this.element);
-            parent.appendChild(this.element);
+        var content = this.content
+        var parent = content.parentNode;
+        if (parent) {
+            parent.removeChild(content);
+            parent.appendChild(content);
         }
-*/
+
         // Focus Foreground Tab
         this.focused.focus();
 
