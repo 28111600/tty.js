@@ -49,17 +49,16 @@
      * Open
      */
 
-    var _isEmptyObject = function(obj) {
-
-        var name;
-        for (name in obj) {
-            return false;
+    var _getObjectChildCount = function(obj) {
+        var count = 0;
+        for (var name in obj) {
+            count++;
         }
-        return true;
+        return count;
     }
 
     window.onbeforeunload = function() {
-        if (!_isEmptyObject(tty.terms)) {
+        if (_getObjectChildCount(tty.terms) != 0) {
             return true;
         }
     }
@@ -132,7 +131,7 @@
                 tab.id = data.id;
                 tty.terms[data.id] = tab;
                 win.resize(data.cols, data.rows);
-                tab.setProcessName(data.process);
+                //  tab.setProcessName(data.process);
                 tty.emit('open tab', tab);
                 tab.emit('open');
             });
@@ -173,6 +172,10 @@
         tty.emit('reset');
     };
 
+    var setTitle = function(title) {
+
+        document.title = (tty.windows.length ? ("[" + (tty.windows.length) + "]") : "") + title;
+    }
 
     /**
      * Window
@@ -256,8 +259,6 @@
             self.emit('open');
         });
 
-
-
     }
 
     inherits(Window, EventEmitter);
@@ -307,6 +308,7 @@
         // Focus Foreground Tab
         this.focused.focus();
 
+        this.focused.handleTitle(this.focused.title);
         tty.emit('focus window', this);
         this.emit('focus');
     };
@@ -324,6 +326,7 @@
             term.destroy();
         });
 
+        setTitle(tty.windows.focused ? tty.window.focused.title : initialTitle);
         tty.emit('close window', this);
         this.emit('close');
     };
@@ -534,7 +537,7 @@
             self.pty = data.pty;
             self.id = data.id;
             tty.terms[self.id] = self;
-            self.setProcessName(data.process);
+            // self.setProcessName(data.process);
             tty.emit('open tab', self);
             self.emit('open');
         });
@@ -548,6 +551,9 @@
         this.socket.emit('data', this.id, data);
     };
 
+
+
+
     // We could just hook in `tab.on('title', ...)`
     // in the constructor, but this is faster.
     Tab.prototype.handleTitle = function(title) {
@@ -557,12 +563,15 @@
         this.title = title;
 
         if (Terminal.focus === this) {
-            document.title = title;
-            // if (h1) h1.innerHTML = title;
+
+            setTitle(title)
+                // if (h1) h1.innerHTML = title;
         }
 
         if (this.window.focused === this) {
             this.window.bar.title = title;
+            this.window.title.innerHTML = title;
+
             // this.setProcessName(this.process);
         }
     };
@@ -593,10 +602,9 @@
             win.element.appendChild(this.element);
             win.focused = this;
 
-            win.title.innerHTML = this.process;
-            document.title = this.title || initialTitle;
-            this.btnClose.style.fontWeight = 'bold';
-            this.btnClose.style.color = '';
+            this.handleTitle(this.title || initialTitle);
+            // this.btnClose.style.fontWeight = 'bold';
+            //this.btnClose.style.color = '';
         }
 
         this.handleTitle(this.title);
@@ -780,7 +788,7 @@
         var self = this;
         this.socket.emit('process', this.id, function(err, name) {
             if (err) return func && func(err);
-            self.setProcessName(name);
+            // self.setProcessName(name);
             return func && func(null, name);
         });
     };
