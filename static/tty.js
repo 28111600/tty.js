@@ -377,6 +377,12 @@
             el = this.element,
             term = this.focused;
 
+        var min = {
+            cols: 40,
+            rows: 10
+
+        }
+
         var resize = {
             w: term.element.clientWidth,
             h: term.element.clientHeight
@@ -385,8 +391,8 @@
         var size = {
             x: ev.pageX,
             y: ev.pageY,
-            w: el.clientWidth,
-            h: el.clientHeight
+            w: term.element.clientWidth,
+            h: term.element.clientHeight
         };
 
 
@@ -398,23 +404,45 @@
 
         function move(ev) {
 
-            var w = size.w + ev.pageX - size.x;
-            var h = size.h + ev.pageY - size.y;
+            var x = (size.w + ev.pageX - size.x) / resize.w;
+            var y = (size.h + ev.pageY - size.y) / resize.h;
+
+            var cols = ((x * term.cols) | 0);
+            var rows = ((y * term.rows) | 0);
+
+            var cols = Math.max(cols, min.cols);
+            var rows = Math.max(rows, min.rows);
+
+
+
+            var w = (cols / term.cols) * resize.w;
+            var h = (rows / term.rows) * resize.h;
 
             el.style.width = w + 'px';
             el.style.height = h + 'px';
 
+
+            self.setSize(cols, rows);
+
         }
 
-        function up() {
-            var x, y;
+        function up(ev) {
 
-            x = el.clientWidth / resize.w;
-            y = el.clientHeight / resize.h;
-            x = (x * term.cols) | 0;
-            y = (y * term.rows) | 0;
+            var x = (size.w + ev.pageX - size.x) / resize.w;
+            var y = (size.h + ev.pageY - size.y) / resize.h;
 
-            self.resize(x - 1, y);
+
+            var cols = ((x * term.cols) | 0);
+            var rows = ((y * term.rows) | 0);
+
+            var cols = Math.max(cols, min.cols);
+            var rows = Math.max(rows, min.rows);
+
+
+            self.resize(cols, rows);
+
+
+            self.setSize(cols, rows);
 
             el.style.width = '';
             el.style.height = '';
@@ -433,7 +461,10 @@
         on(document, 'mouseup', up);
 
     };
-
+    Window.prototype.setSize = function(cols, rows) {
+        var size = this.size;
+        size.innerHTML = cols + "×" + rows;
+    }
 
     Window.prototype.resize = function(cols, rows) {
         this.cols = cols;
@@ -443,8 +474,7 @@
             term.resize(cols, rows);
         });
 
-        var size = this.size;
-        size.innerHTML = cols + "×" + rows;
+        this.setSize(cols, rows);
         tty.emit('resize window', this, cols, rows);
         this.emit('resize', cols, rows);
     };

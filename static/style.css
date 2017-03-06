@@ -96,14 +96,13 @@ body {
     width: 1em;
     height: 1em;
     cursor: se-resize;
-    z-index: -1;
     background: transparent;
 }
 
 .grip:hover {}
 
 .terminal {
-    border: #000 solid 5px;
+    /*border: #000 solid 5px;*/
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
     color: #f0f0f0;
