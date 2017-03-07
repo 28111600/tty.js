@@ -423,11 +423,9 @@
         };
 
 
-        el.style.overflow = 'hidden';
-        el.style.opacity = '0.70';
-        el.style.cursor = 'se-resize';
+
         root.style.cursor = 'se-resize';
-        term.element.style.height = '100%';
+        // term.element.style.height = '100%';
 
         function move(ev) {
 
@@ -474,11 +472,9 @@
             el.style.width = '';
             el.style.height = '';
 
-            el.style.overflow = '';
-            el.style.opacity = '';
-            el.style.cursor = '';
+
             root.style.cursor = '';
-            term.element.style.height = '';
+            // term.element.style.height = '';
 
             off(document, 'mousemove', move);
             off(document, 'mouseup', up);
