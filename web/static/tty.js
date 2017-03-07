@@ -49,6 +49,17 @@
      * Open
      */
 
+    var isHidden = false;
+    document.addEventListener("visibilitychange", function() {
+        isHidden = document.hidden;
+        if (!isHidden) {
+
+            setTitle();
+
+        }
+    }, false);
+
+
     var _getObjectChildCount = function(obj) {
         var count = 0;
         for (var name in obj) {
@@ -170,10 +181,15 @@
         tty.emit('reset');
     };
 
-    var setTitle = function(title) {
 
-        document.title = (tty.windows.length ? ("[" + (tty.windows.length) + "]") : "") + title;
-    }
+    var setTitle = (function() {
+        var _title;
+        return function(title) {
+
+            document.title = (isHidden ? "*" : "") + (tty.windows.length ? ("[" + (tty.windows.length) + "]") : "") + (title || _title);
+            _title = title || _title;
+        }
+    })();
 
     /**
      * Window
@@ -618,7 +634,8 @@
     Tab.prototype._write = Tab.prototype.write;
 
     Tab.prototype.write = function(data) {
-        if (this.window.focused !== this) this.btnClose.style.color = 'red';
+        //  if (this.window.focused !== this) this.btnClose.style.color = 'red';
+        if (isHidden) { setTitle() };
         return this._write(data);
     };
 
