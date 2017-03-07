@@ -3,7 +3,8 @@ var path = require("path");
 var app = tty.createServer({
     shell: 'bash',
     shellArgs: [path.resolve(__dirname, "login.sh")],
-    port: 8080
+    port: 8080,
+    geometry: [80, 25]
 });
 
 app.listen();
