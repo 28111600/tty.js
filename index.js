@@ -4,7 +4,9 @@ var app = tty.createServer({
     shell: 'bash',
     shellArgs: [path.resolve(__dirname, "login.sh")],
     port: 8080,
-    geometry: [80, 25]
+    term: {
+        geometry: [80, 25]
+    }
 });
 
 app.listen();
