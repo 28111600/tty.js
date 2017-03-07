@@ -331,6 +331,15 @@
         this.emit('close');
     };
 
+    var getDragRange = function(el, content) {
+
+        var range = {
+            x: { min: 0, max: content.clientWidth },
+            y: { min: 0, max: content.clientHeight }
+        }
+        return range;
+    }
+
     Window.prototype.drag = function(ev) {
         var self = this,
             content = this.content;
@@ -342,19 +351,23 @@
             pageY: ev.pageY
         };
 
+        var w = content.clientWidth,
+            h = content.clientHeight;
         //el.style.opacity = '0.60';
+        var range = getDragRange(content, body);
 
         function move(ev) {
-            content.style.left =
-                (drag.left + ev.pageX - drag.pageX) + 'px';
-            content.style.top =
-                (drag.top + ev.pageY - drag.pageY) + 'px';
+            var x = (drag.left + ev.pageX - drag.pageX);
+            var y = (drag.top + ev.pageY - drag.pageY);
+
+            x = Math.max(Math.min(x, range.x.max - w), range.x.min);
+            y = Math.max(Math.min(y, range.y.max - h), range.y.min);
+
+            content.style.left = x + 'px';
+            content.style.top = y + 'px';
         }
 
         function up() {
-            content.style.opacity = '';
-            content.style.cursor = '';
-            root.style.cursor = '';
 
             off(document, 'mousemove', move);
             off(document, 'mouseup', up);
