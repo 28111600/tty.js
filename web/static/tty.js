@@ -113,8 +113,6 @@
 
         // XXX Clean this up.
         tty.socket.on('sync', function(terms) {
-            console.log('Attempting to sync...');
-            console.log(terms);
 
             tty.reset();
 
@@ -593,8 +591,6 @@
     Tab.prototype.handler = function(data) {
         this.socket.emit('data', this.id, data);
     };
-
-
 
 
     // We could just hook in `tab.on('title', ...)`
